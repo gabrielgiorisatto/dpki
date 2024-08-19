@@ -3,6 +3,10 @@ import logging
 import requests
 import json
 from urllib.parse import urlparse
+from Crypto.PublicKey import RSA
+from Crypto.Signature import pkcs1_15
+from Crypto.Hash import SHA256
+import base64
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
@@ -22,24 +26,38 @@ def str2hex(str):
     """
     return "0x" + str.encode("utf-8").hex()
 
-# Simulate a simple in-memory storage for keys (in production, consider using a database)
+def load_public_key_base64(public_key_base64):
+    return RSA.import_key(base64.b64decode(public_key_base64))
+
+def verify_signature(message, signature_base64, public_key_base64):
+    public_key = load_public_key_base64(public_key_base64)
+    h = SHA256.new(message.encode('utf-8'))
+    try:
+        pkcs1_15.new(public_key).verify(h, base64.b64decode(signature_base64))
+        return True
+    except (ValueError, TypeError):
+        return False
+
 public_keys = {}
 
 def handle_advance(data):
     logger.info(f"Received advance request data {data}")
     payload = json.loads(hex2str(data["payload"]))
 
-    # Parse the payload (this could be in JSON format or another suitable format)
     action = payload["action"]
     key = payload["key"]
     signature = payload["signature"]
+    message = payload.get("message", "")
 
-    if action == "register":
-        # Logic to register the public key
-        public_keys[key] = {"status": "active", "signature": signature}
-        notice = {"payload": str2hex(f"Key {key} registered successfully.")}
+    if not verify_signature(message, signature, key):
+        notice = {"payload": str2hex(f"Invalid message signature.")}
+    elif action == "register":
+        if verify_signature(message, signature, key):
+            public_keys[key] = {"status": "active", "signature": signature}
+            notice = {"payload": str2hex(f"Key {key} registered successfully.")}
+        else:
+            notice = {"payload": str2hex(f"Invalid message signature.")}
     elif action == "revoke":
-        # Logic to revoke the public key
         if key in public_keys and public_keys[key]["status"] == "active":
             public_keys[key]["status"] = "revoked"
             notice = {"payload": str2hex(f"Key {key} revoked successfully.")}
@@ -55,7 +73,6 @@ def handle_advance(data):
 def handle_inspect(data):
     logger.info(f"Received inspect request data {data}")
     url = urlparse(hex2str(data["payload"]))
-    # key = hex2str(data["key"])
     key = url.path.replace("key/", "").split("/")[0]
     logger.info(f"URL {url} KEY {key}")
     if key in public_keys:
