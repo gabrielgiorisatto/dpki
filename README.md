@@ -88,3 +88,5 @@ Siga os seguintes passos para configurar e executar o projeto:
 ## Recursos Adicionais
 
 Para mais detalhes, consulte o vídeo disponibilizado no repositório.
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/nKP_J0pSDGg/0.jpg)](https://www.youtube.com/watch?v=nKP_J0pSDGg)
