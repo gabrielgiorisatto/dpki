@@ -17,7 +17,7 @@ O código é implementado em Python e permite gerar e gerenciar chaves criptogr�
 Antes de executar o projeto, certifique-se de ter o seguinte instalado:
 
 - Python 3.x
-- [Cartesi CLI](https://cartesi.io/docs/next/machine/cli/)
+- [Cartesi CLI](https://docs.cartesi.io/cartesi-rollups/1.5/development/installation/)
 
 ## Como Executar
 
@@ -32,7 +32,7 @@ Siga os seguintes passos para configurar e executar o projeto:
 
 2. **Instale o Cartesi CLI:**
 
-   Siga as instruções na [documentação do Cartesi CLI](https://cartesi.io/docs/next/machine/cli/).
+   Siga as instruções na [documentação do Cartesi CLI](https://docs.cartesi.io/cartesi-rollups/1.5/development/installation/).
 
 3. **Construa o projeto:**
 
